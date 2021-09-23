@@ -1,4 +1,5 @@
 <?php
+session_start();
 require_once "pdo.php";
 require_once "util.php";
 if ( isset($_POST['name']) && isset($_POST['email']) && isset($_POST['phone']) 
@@ -6,30 +7,29 @@ if ( isset($_POST['name']) && isset($_POST['email']) && isset($_POST['phone'])
      {
 		//  Validate if all fields are populated
          if (strlen($_POST['name']) < 1 || strlen($_POST['email']) < 1 || strlen($_POST['phone']) < 1 ||  strlen($_POST['industry']) < 1)
-         {
+         {	//If not return to index with error message
             $_SESSION['error'] = "All fields are required";
             header("Location: index.php");
         return;
          }
          
          else {
-            $stmt = $pdo->prepare('INSERT INTO Profile
+            $stmt = $pdo->prepare('INSERT INTO List
             ( name, email, phone, industry)
             VALUES ( :nme, :em, :ph, :ind)');
           
           $stmt->execute(array(
-            ':nme' => $_POST['nm'],
-            ':em' => $_POST['em'],
-            ':ph' => $_POST['ph'],
-            ':ind' => $_POST['ind'])
+            ':nme' => $_POST['name'],
+            ':em' => $_POST['email'],
+            ':ph' => $_POST['phone'],
+            ':ind' => $_POST['industry'])
           );
-      $_SESSION['success'] = "added";
-header("Location: index.php");
-return;
+      $_SESSION['success'] = "Form successfully submitted";
+		header("Location: index.php");
+		return;
     }
     
 }
-
 ?>
 <html lang="en">
 	<head>
@@ -51,12 +51,12 @@ return;
 			<h1 id="heroTxt">
 				Geofencing:<br />
 				Location-based<br />
-				Technology for <br />
-				Recruitment <br />
+				Technology for<br />
+				Recruitment<br />
 				Strategies.
             </h1>
 		</div>
-		<form id="signUpForm">
+		<form method="POST" id="signUpForm" >
                 <h2 id="formHead">Connect with one of our <br/> experts to learn more!</h2>
                 <label for="nm">NAME *</label><br/>
                 <input type="text" name="name" id="nm"/></label><br/>
@@ -67,7 +67,9 @@ return;
                 <label for="ind">INDUSTRY *</label><br/>
                 <input type="text" name="industry" id="ind"/><br/>
                 <input type="submit" name="send" value="SEND AWAY!" id="snd"/>
-				<?php PHP_EOL.flashMessages(); ?>
+				<?php
+        flashMessages();
+        ?>
          </form>
 		</main>
 		<footer>&copy; BAYARD ADVERTISING.<wbr> ALL RIGHTS RESERVED.</footer>
